@@ -1,5 +1,6 @@
 package com.agprincefu.andriod.geoquiz;
 
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,6 +17,8 @@ public class QuizActivity extends AppCompatActivity {
     private Button mFalseButton;
     private Button mNextButton;
     private TextView mQuestionTextView;
+    private int mResponseNumber=0;
+    private int mScore=0;
 
     private Question[] mQuestionBank = new Question[]{
             new Question(R.string.question_australia, true),
@@ -53,7 +56,20 @@ public class QuizActivity extends AppCompatActivity {
                 //Toast toast = Toast.makeText(QuizActivity.this,R.string.correct_toast,Toast.LENGTH_SHORT);
                 //toast.setGravity(Gravity.TOP,0,40);
                 // toast.show();
+
                 checkAnswer(true);
+                if(!mQuestionBank[mCurrentIndex].isResponse()){
+                    mQuestionBank[mCurrentIndex].setResponse(true);
+                    mFalseButton.setClickable(false);
+                    mTrueButton.setClickable(false);
+                    mResponseNumber++;
+                    
+                }
+                if(mResponseNumber == mQuestionBank.length){
+                    Toast.makeText(QuizActivity.this,"You anwser all ,this scroe is : "+mScore*100/mQuestionBank.length,Toast.LENGTH_SHORT).show();
+                }
+
+
             }
         });
         mFalseButton.setOnClickListener(new View.OnClickListener() {
@@ -62,6 +78,16 @@ public class QuizActivity extends AppCompatActivity {
                 //Toast.makeText(QuizActivity.this,R.string.incorrect_toast,Toast.LENGTH_SHORT).show();
                 checkAnswer(false);
 
+                if(!mQuestionBank[mCurrentIndex].isResponse()){
+                    mQuestionBank[mCurrentIndex].setResponse(true);
+                    mFalseButton.setClickable(false);
+                    mTrueButton.setClickable(false);
+                    mResponseNumber++;
+                }
+                if(mResponseNumber == mQuestionBank.length){
+                    Toast.makeText(QuizActivity.this,"You anwser all ,this scroe is : "+mScore*100/mQuestionBank.length*100,Toast.LENGTH_SHORT).show();
+                }
+
             }
         });
         mNextButton.setOnClickListener(new View.OnClickListener() {
@@ -69,6 +95,11 @@ public class QuizActivity extends AppCompatActivity {
             public void onClick(View v) {
                 mCurrentIndex = (mCurrentIndex + 1) % mQuestionBank.length;
                 updateQuestion();
+                if(!mQuestionBank[mCurrentIndex].isResponse()){
+                    mFalseButton.setClickable(true);
+                    mTrueButton.setClickable(true);
+                }
+
 
             }
         });
@@ -126,10 +157,12 @@ public class QuizActivity extends AppCompatActivity {
 
         if (userPressedTrue == answerTrue) {
             messageAnswer = R.string.correct_toast;
+            mScore++;
         } else {
             messageAnswer = R.string.incorrect_toast;
         }
 
         Toast.makeText(this, messageAnswer, Toast.LENGTH_SHORT).show();
     }
+
 }
