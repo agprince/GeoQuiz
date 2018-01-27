@@ -14,6 +14,8 @@ import android.widget.Toast;
 public class QuizActivity extends AppCompatActivity {
     private static final String TAG = "agtest";
     private static final String KEY_INDEX = "index";
+    private static final String KEY_IS_CHEAT = "Cheated";
+    private static final String KEY_CHEAT_TIMES = "cheatTimes";
     private static final int REQUEST_CODE_CHEAT = 0;
 
     private Button mTrueButton;
@@ -21,6 +23,8 @@ public class QuizActivity extends AppCompatActivity {
     private Button mNextButton;
     private Button mCheatButton;
     private TextView mQuestionTextView;
+
+    private int mCheatTimes = 0;
 
 
     private Question[] mQuestionBank = new Question[]{
@@ -44,6 +48,8 @@ public class QuizActivity extends AppCompatActivity {
         Log.d(TAG, "onCreate(Bundle) called");
         if (savedInstanceState != null) {
             mCurrentIndex = savedInstanceState.getInt(KEY_INDEX, 0);
+            mIsCheated = savedInstanceState.getBoolean(KEY_IS_CHEAT, false);
+            mCheatTimes = savedInstanceState.getInt(KEY_CHEAT_TIMES, 0);
         }
 
         mTrueButton = findViewById(R.id.true_button);
@@ -84,6 +90,13 @@ public class QuizActivity extends AppCompatActivity {
         mNextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (mIsCheated) {
+                    mCheatTimes++;
+                }
+                if (mCheatTimes >= 3) {
+                    mCheatButton.setClickable(false);
+                }
+
                 mIsCheated = false;
                 mCurrentIndex = (mCurrentIndex + 1) % mQuestionBank.length;
                 updateQuestion();
@@ -133,6 +146,10 @@ public class QuizActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
         Log.i(TAG, "onSaveInstanceState");
         outState.putInt(KEY_INDEX, mCurrentIndex);
+        outState.putBoolean(KEY_IS_CHEAT, mIsCheated);
+        outState.putInt(KEY_CHEAT_TIMES, mCheatTimes);
+
+
     }
 
     @Override
@@ -161,6 +178,7 @@ public class QuizActivity extends AppCompatActivity {
 
         if (mIsCheated) {
             messageAnswer = R.string.judgment_toast;
+
         } else {
 
             if (userPressedTrue == answerTrue) {
